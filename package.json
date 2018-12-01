@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "discord-bot-webhook": "^1.0.4",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
   }
 }
