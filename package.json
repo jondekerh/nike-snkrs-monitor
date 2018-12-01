@@ -1,15 +1,24 @@
 {
   "name": "nike-snkrs-monitor",
   "version": "1.0.0",
-  "description": "nike snkrs page monitor",
+  "description": "a discord monitor for nike snkrs",
   "main": "monitor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jondekerh/nike-snkrs-monitor.git"
+  },
   "author": "Jon H",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jondekerh/nike-snkrs-monitor/issues"
+  },
+  "homepage": "https://github.com/jondekerh/nike-snkrs-monitor#readme",
   "dependencies": {
     "discord-bot-webhook": "^1.0.4",
     "request": "^2.88.0",
+    "request-promise": "^4.2.2"
   }
 }
