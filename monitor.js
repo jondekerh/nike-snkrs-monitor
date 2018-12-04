@@ -87,6 +87,11 @@ function monitor() {
       console.log('this shouldn\'t be an issue, moving on...')
     }
     console.log(completeArr.length);
+    return completeArr;
+  })
+  .then ((completeArr) => {
+    currentStock = completeArr;
+    console.log(currentStock);
   })
   .catch ((err) => {
     console.log(err);
@@ -94,4 +99,4 @@ function monitor() {
   return completeArr;
 };
 
-console.log(monitor());
+monitor();
