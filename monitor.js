@@ -14,17 +14,22 @@ var currentStock = [];
 var newStock = [];
 
 function findArrayDifferences(arr1, arr2) {
-    return _.difference(arr1, arr2)
+    return _.difference(arr1, arr2);
 }
 
 function updates(arr) {
   if (cycle === 0) {
     currentStock = arr;
+    console.log('Initial scan complete, ' + currentStock.length + ' items found. Drops and restocks will be checked in the next cycle.');
+    console.log(' ');
+    console.log(currentStock[0].id);
     cycle++;
-    console.log(currentStock.length, cycle);
   } else {
-    console.log('yep');
-    cycle++
+    newStock = arr;
+    var newDrops = findArrayDifferences(newStock, currentStock);
+    console.log('Cycle ' + cycle + ' complete!');
+    console.log(' ');
+    cycle++;
   }
 };
 
@@ -35,7 +40,6 @@ function monitor() {
 
   rp.get(nikeURLs[0])
   .then((body) => {
-    console.log('first!')
     let json = JSON.parse(body);
     try {
       for (x in json.objects) {
@@ -47,13 +51,11 @@ function monitor() {
       console.log(ex)
       console.log('this shouldn\'t be an issue, moving on...')
     }
-    console.log(completeArr.length);
   })
   .then(() => {
     return rp.get(nikeURLs[1]);
   })
   .then((body) => {
-    console.log('second!')
     let json = JSON.parse(body);
     try {
       for (x in json.objects) {
@@ -65,13 +67,11 @@ function monitor() {
       console.log(ex)
       console.log('this shouldn\'t be an issue, moving on...')
     }
-    console.log(completeArr.length);
   })
   .then(() => {
     return rp.get(nikeURLs[2]);
   })
   .then((body) => {
-    console.log('third!')
     let json = JSON.parse(body);
     try {
       for (x in json.objects) {
@@ -83,13 +83,11 @@ function monitor() {
       console.log(ex)
       console.log('this shouldn\'t be an issue, moving on...')
     }
-    console.log(completeArr.length);
   })
   .then(() => {
     return rp.get(nikeURLs[3]);
   })
   .then((body) => {
-    console.log('fourth!')
     let json = JSON.parse(body);
     try {
       for (x in json.objects) {
@@ -101,7 +99,6 @@ function monitor() {
       console.log(ex)
       console.log('this shouldn\'t be an issue, moving on...')
     }
-    console.log(completeArr.length);
     return completeArr;
   })
   .then ((completeArr) => {
