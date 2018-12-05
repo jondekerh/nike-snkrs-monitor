@@ -13,22 +13,36 @@ var refreshDelay = 10000; //default is 10 mins (600000), feel free to change
 var currentStock = [];
 var newStock = [];
 
-function findArrayDifferences(arr1, arr2) {
-    return _.difference(arr1, arr2);
-}
+function findNewDrops(arr1, arr2) {
+  var differences = [];
+  var arr1Shallow = [];
+  for (i in arr1) {
+    arr1Shallow.push(arr1[i].id);
+  };
+  for (i in arr2) {
+    if (!arr1Shallow.includes(arr2[i].id)) {
+      differences.push(arr2[i]);
+    }
+  };
+  return differences;
+};
 
 function updates(arr) {
   if (cycle === 0) {
     currentStock = arr;
     console.log('Initial scan complete, ' + currentStock.length + ' items found. Drops and restocks will be checked in the next cycle.');
     console.log(' ');
-    console.log(currentStock[0].id);
     cycle++;
   } else {
     newStock = arr;
-    var newDrops = findArrayDifferences(newStock, currentStock);
+    var newDrops = findNewDrops(currentStock, newStock);
+      for (i in newDrops) {
+        //post each new item to discord
+      };
     console.log('Cycle ' + cycle + ' complete!');
     console.log(' ');
+    currentStock = newStock;
+    newStock = [];
     cycle++;
   }
 };
