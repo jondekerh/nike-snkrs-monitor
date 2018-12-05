@@ -16,6 +16,7 @@ var newStock = [];
 function findNewDrops(arr1, arr2) {
   var differences = [];
   var arr1Shallow = [];
+  //make a shallow clone of arr1 with just the ids for easy lookups
   for (i in arr1) {
     arr1Shallow.push(arr1[i].id);
   };
@@ -35,12 +36,30 @@ function updates(arr) {
     cycle++;
   } else {
     newStock = arr;
+    currentShallow = [];
+    for (i in currentStock) {
+      currentShallow.push(currentStock[i].id);
+    };
+    newStock = newStock.sort(function(a,b){
+      return currentShallow.indexOf(a.id) - currentShallow.indexOf(b.id);
+    });
+    for (i in newStock) {
+      if (!currentShallow.includes(newStock[i].id)) {
+        newStock.push(newStock.shift());
+      }
+    };
     var newDrops = findNewDrops(currentStock, newStock);
       for (i in newDrops) {
         //post each new item to discord
       };
     console.log('Cycle ' + cycle + ' complete!');
     console.log(' ');
+    console.log(currentStock[0]);
+    console.log(currentStock[1]);
+    console.log(currentStock[2]);
+    console.log(newStock[0]);
+    console.log(newStock[1]);
+    console.log(newStock[2]);
     currentStock = newStock;
     newStock = [];
     cycle++;
