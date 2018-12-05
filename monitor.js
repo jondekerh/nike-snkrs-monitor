@@ -9,9 +9,24 @@ const nikeURLs = [
 ];
 
 var cycle = 0; //dont change this
-var refreshDelay = 300000; //default is 5 mins, feel free to change
+var refreshDelay = 10000; //default is 10 mins (600000), feel free to change
 var currentStock = [];
 var newStock = [];
+
+function findArrayDifferences(arr1, arr2) {
+    return _.difference(arr1, arr2)
+}
+
+function updates(arr) {
+  if (cycle === 0) {
+    currentStock = arr;
+    cycle++;
+    console.log(currentStock.length, cycle);
+  } else {
+    console.log('yep');
+    cycle++
+  }
+};
 
 
 function monitor() {
@@ -90,13 +105,14 @@ function monitor() {
     return completeArr;
   })
   .then ((completeArr) => {
-    currentStock = completeArr;
-    console.log(currentStock);
+    updates(completeArr);
   })
   .catch ((err) => {
     console.log(err);
   })
-  return completeArr;
+  setTimeout(() => {
+    monitor();
+  }, refreshDelay);
 };
 
 monitor();
