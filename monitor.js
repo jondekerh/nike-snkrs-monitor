@@ -13,15 +13,30 @@ var refreshDelay = 10000; //default is 10 mins (600000), feel free to change
 var currentStock = [];
 var newStock = [];
 
-function findNewDrops(arr1, arr2) {
+function findRestocks(arr1, arr2) {
+  restocks = [];
+  for (i in arr1) { //go through currentStock
+    for (j in arr1[i].productInfo) { //go through each index in productInfo of current product
+      for (k in arr1[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
+        if (arr1[i].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available == true) {
+          restocks.push({
+            "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
+            "name": arr2[i].productInfo[j].productContent.title,
+            "color": arr2[i].productInfo[j].productContent.colorDescription,
+            "size": arr2[i].productInfo[j].skus[k].nikeSize,
+            "price": arr2[i].productInfo[j].merchPrice.currentPrice
+          });
+        }
+      }
+    }
+  }
+  return restocks;
+};
+
+function findNewDrops(arr2, shallowArr1) {
   var differences = [];
-  var arr1Shallow = [];
-  //make a shallow clone of arr1 with just the ids for easy lookups
-  for (i in arr1) {
-    arr1Shallow.push(arr1[i].id);
-  };
   for (i in arr2) {
-    if (!arr1Shallow.includes(arr2[i].id)) {
+    if (!shallowArr1.includes(arr2[i].id)) {
       differences.push(arr2[i]);
     }
   };
@@ -36,30 +51,40 @@ function updates(arr) {
     cycle++;
   } else {
     newStock = arr;
+    //create a shallow clone of currentStock with just IDs for easier sorting of newStock using the .sort method
     currentShallow = [];
     for (i in currentStock) {
       currentShallow.push(currentStock[i].id);
     };
+    //sort newStock so that the indices of its IDs match those of currentStock
     newStock = newStock.sort(function(a,b){
       return currentShallow.indexOf(a.id) - currentShallow.indexOf(b.id);
     });
+    //by default items not in currentStock are placed first in newStock with the above method
+    //this method places them last
     for (i in newStock) {
       if (!currentShallow.includes(newStock[i].id)) {
         newStock.push(newStock.shift());
       }
     };
-    var newDrops = findNewDrops(currentStock, newStock);
-      for (i in newDrops) {
-        //post each new item to discord
-      };
+    //all this is done so that the indices of all items in both currentStock AND newStock match up,
+    //which is the basis for how restocks() works without using a milliion nested for loops.
+    //it still uses a lot of nested for loops though lol
+
+    //find all the new items from this scan and post them
+    var newDrops = findNewDrops(newStock, currentShallow);
+    for (i in newDrops) {
+      //post each new item to discord
+    };
+
+    //find all restocks by size from this scan and post them
+    var restockedItems = findRestocks(currentStock, newStock);
+    for (i in restockedItems) {
+      //post each restock to discord
+    };
+
     console.log('Cycle ' + cycle + ' complete!');
     console.log(' ');
-    console.log(currentStock[0]);
-    console.log(currentStock[1]);
-    console.log(currentStock[2]);
-    console.log(newStock[0]);
-    console.log(newStock[1]);
-    console.log(newStock[2]);
     currentStock = newStock;
     newStock = [];
     cycle++;
@@ -81,8 +106,11 @@ function monitor() {
         }
       }
     } catch(ex) {
-      console.log(ex)
-      console.log('this shouldn\'t be an issue, moving on...')
+      console.log(ex);
+      console.log('this shouldn\'t be an issue, moving on...');
+      //sometimes while I was building this it would attempt to scan an object that wasn't there, which
+      //would throw an error and crash the whole thing. However the program can still go on despite this with
+      //no issue, which is why this catch is here. It hasn't happened since production though.
     }
   })
   .then(() => {
@@ -97,8 +125,8 @@ function monitor() {
         }
       }
     } catch(ex) {
-      console.log(ex)
-      console.log('this shouldn\'t be an issue, moving on...')
+      console.log(ex);
+      console.log('this shouldn\'t be an issue, moving on...');
     }
   })
   .then(() => {
@@ -113,8 +141,8 @@ function monitor() {
         }
       }
     } catch(ex) {
-      console.log(ex)
-      console.log('this shouldn\'t be an issue, moving on...')
+      console.log(ex);
+      console.log('this shouldn\'t be an issue, moving on...');
     }
   })
   .then(() => {
@@ -129,8 +157,8 @@ function monitor() {
         }
       }
     } catch(ex) {
-      console.log(ex)
-      console.log('this shouldn\'t be an issue, moving on...')
+      console.log(ex);
+      console.log('this shouldn\'t be an issue, moving on...');
     }
     return completeArr;
   })
