@@ -14,7 +14,7 @@ const hook = new discord.WebhookClient(discordInfo.hookId, discordInfo.hookToken
 
 
 var cycle = 0; //dont change this
-var refreshDelay = 600000; //default is 10 mins (600000), feel free to change
+var refreshDelay = 300000; //default is 5 mins (300000), feel free to change
 var currentStock = [];
 var newStock = [];
 
@@ -59,6 +59,7 @@ function updates(arr) {
   if (cycle === 0) {
     currentStock = arr;
     console.log('Initial scan complete, ' + currentStock.length + ' items found. Drops and restocks will be checked in the next cycle.');
+    console.log(Date());
     console.log(' ');
     cycle++;
   } else {
@@ -152,6 +153,7 @@ function updates(arr) {
     };
 
     console.log('Cycle ' + cycle + ' complete!');
+    console.log(Date());
     console.log(' ');
     currentStock = newStock;
     newStock = [];
