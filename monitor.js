@@ -19,7 +19,7 @@ var currentStock = [];
 var newStock = [];
 
 function findRestocks(arr1, arr2) {
-  restocks = [];
+  var restocks = [];
   for (i in arr1) { //go through currentStock
     for (j in arr1[i].productInfo) { //go through each index in productInfo of current product
       for (k in arr1[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
@@ -61,6 +61,7 @@ function updates(arr) {
     console.log('Initial scan complete, ' + currentStock.length + ' items found. Drops and restocks will be checked in the next cycle.');
     console.log(Date());
     console.log(' ');
+    hook.send('Now watching Nike Snkrs!');
     cycle++;
   } else {
     newStock = arr;
