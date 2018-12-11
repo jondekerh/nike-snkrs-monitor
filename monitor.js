@@ -23,7 +23,9 @@ function findRestocks(arr1, arr2) {
   for (i in arr1) { //go through currentStock
     for (j in arr1[i].productInfo) { //go through each index in productInfo of current product
       for (k in arr1[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
-        if (arr1[i].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available == true) {
+        if (arr1[i].productInfo[j].availableSkus[k] == null) {
+          break;
+        } else if (arr1[i].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available == true) {
           restocks.push({
             "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
             "name": arr2[i].productInfo[j].productContent.title,
