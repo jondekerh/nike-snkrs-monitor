@@ -18,25 +18,30 @@ var refreshDelay = 300000; //default is 5 mins (300000), feel free to change
 var currentStock = [];
 var newStock = [];
 
-function findRestocks(arr1, arr2) {
+function findRestocks(arr1, arr2, shallowArr1) {
   var restocks = [];
-  for (i in arr1) { //go through currentStock
-    for (j in arr1[i].productInfo) { //go through each index in productInfo of current product
-      for (k in arr1[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
-        if (arr2[i].productInfo[j] == null) {
-          console.log('findRestocks cannot find a SKU in the new scan. Ignoring...');
-          break;
-        } else if (arr1[i].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available === true) {
-          restocks.push({
-            "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
-            "name": arr2[i].productInfo[j].productContent.title,
-            "color": arr2[i].productInfo[j].productContent.colorDescription,
-            "size": arr2[i].productInfo[j].skus[k].nikeSize,
-            "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
-            "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
-          });
+  for (i in arr2) { //go through currentStock
+    if (shallowArr1.includes(arr2[i].id)) { //validation i guess
+      var n = shallowArr1.indexOf(arr2[i].id);
+      for (j in arr2[i].productInfo) { //go through each index in productInfo of current product
+        for (k in arr2[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
+          if (arr1[n].productInfo[j] == null) { //this could be moved up in scope, dont worry abt it for now
+            console.log('findRestocks cannot find product info in the new scan. Ignoring...');
+            break;
+          } else if (arr1[n].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available === true) {
+            restocks.push({
+              "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
+              "name": arr2[i].productInfo[j].productContent.title,
+              "color": arr2[i].productInfo[j].productContent.colorDescription,
+              "size": arr2[i].productInfo[j].skus[k].nikeSize,
+              "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
+              "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
+            });
+          }
         }
       }
+    } else {
+      console.log('Item not found in previous scan. Ignoring...');
     }
   }
   return restocks;
@@ -73,7 +78,9 @@ function updates(arr) {
     for (i in currentStock) {
       currentShallow.push(currentStock[i].id);
     };
+    //ALL OF THIS IS UNNECESSARY NOW GAWD DELET IT PLS
     //sort newStock so that the indices of its IDs match those of currentStock
+    //ALL OF THIS IS UNNECESSARY NOW GAWD DELET IT PLS
     newStock = newStock.sort(function(a,b){
       return currentShallow.indexOf(a.id) - currentShallow.indexOf(b.id);
     });
@@ -121,7 +128,7 @@ function updates(arr) {
     };
 
     //find all restocks by size from this scan and post them
-    var restockedItems = findRestocks(currentStock, newStock);
+    var restockedItems = findRestocks(currentStock, newStock, currentShallow);
     for (i in restockedItems) {
       hook.send({
         embeds: [{
