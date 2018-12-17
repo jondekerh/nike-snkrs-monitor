@@ -2,12 +2,7 @@ const request = require('request');
 const rp = require('request-promise');
 const discord = require('discord.js');
 const discordInfo = require('./discord-info.json');
-const nikeURLs = [
-  'https://api.nike.com/product_feed/threads/v2/?anchor=0&count=50&filter=marketplace%28US%29&filter=language%28en%29&filter=inStock%28true%29&filter=productInfo.merchPrice.discounted%28false%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom',
-  'https://api.nike.com/product_feed/threads/v2/?anchor=50&count=50&filter=marketplace%28US%29&filter=language%28en%29&filter=inStock%28true%29&filter=productInfo.merchPrice.discounted%28false%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom',
-  'https://api.nike.com/product_feed/threads/v2/?anchor=100&count=50&filter=marketplace%28US%29&filter=language%28en%29&filter=inStock%28true%29&filter=productInfo.merchPrice.discounted%28false%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom',
-  'https://api.nike.com/product_feed/threads/v2/?anchor=150&count=50&filter=marketplace%28US%29&filter=language%28en%29&filter=inStock%28true%29&filter=productInfo.merchPrice.discounted%28false%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom'
-];
+const nikeURLs = require('./urls.json');
 
 //remember to rename your .json file!
 const hook = new discord.WebhookClient(discordInfo.hookId, discordInfo.hookToken);
@@ -20,36 +15,48 @@ var newStock = [];
 
 function findRestocks(arr1, arr2, shallowArr1) {
   var restocks = [];
-  for (i in arr2) { //go through currentStock
-    if (shallowArr1.includes(arr2[i].id)) { //validation i guess
+  //iterate through each item in newStock
+  for (i in arr2) {
+    //check if the items id matches an id from currentStock
+    if (shallowArr1.includes(arr2[i].id)) {
+      //set n equal to the index of the matching id in currentStock
       var n = shallowArr1.indexOf(arr2[i].id);
-      for (j in arr2[i].productInfo) { //go through each index in productInfo of current product
-        for (k in arr2[i].productInfo[j].availableSkus) { //go through the availableSkus array for each index in productInfo
-          if (arr1[n].productInfo[j] == null) { //this could be moved up in scope, dont worry abt it for now
-            console.log('findRestocks cannot find product info in the new scan. Ignoring...');
-            break;
-          } else if (arr1[n].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available === true) {
-            restocks.push({
-              "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
-              "name": arr2[i].productInfo[j].productContent.title,
-              "color": arr2[i].productInfo[j].productContent.colorDescription,
-              "size": arr2[i].productInfo[j].skus[k].nikeSize,
-              "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
-              "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
-            });
+      //then iterate through each index in productInfo of current item
+      for (j in arr2[i].productInfo) {
+        //then iterate through each index in availableSkus and check if that sku was unavailable in currentStock
+        //and available in newStock. If this is true, push an object with that items info to our restocks array
+        //but first, check if the value is null for whatever reason (sort of a bug, needs fixing)
+        if (arr1[n].productInfo[j] == null) {
+          console.log('findRestocks cannot find product info in the new scan. Ignoring...');
+          break;
+        } else {
+          for (k in arr2[i].productInfo[j].availableSkus) {
+            if (arr1[n].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available === true) {
+              restocks.push({
+                "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
+                "name": arr2[i].productInfo[j].productContent.title,
+                "color": arr2[i].productInfo[j].productContent.colorDescription,
+                "size": arr2[i].productInfo[j].skus[k].nikeSize,
+                "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
+                "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
+              });
+            }
           }
         }
       }
     } else {
+      //this means the item was most likely removed from the snkrs page for whatever reason
       console.log('Item not found in previous scan. Ignoring...');
     }
   }
   return restocks;
 };
 
-function findNewDrops(arr2, shallowArr1) {
+function findNewItems(arr2, shallowArr1) {
   var differences = [];
   for (i in arr2) {
+    //if our new items were not previously in currentStock, push an object with that items info
+    //to our differences array
     if (!shallowArr1.includes(arr2[i].id)) {
       differences.push({
         "thumbnail": arr2[i].productInfo[0].imageUrls.productImageUrl,
@@ -64,6 +71,7 @@ function findNewDrops(arr2, shallowArr1) {
 };
 
 function updates(arr) {
+  //if startup cycle, only do one scan and set it as currentStock
   if (cycle === 0) {
     currentStock = arr;
     console.log('Initial scan complete, ' + currentStock.length + ' items found. Drops and restocks will be checked in the next cycle.');
@@ -71,56 +79,43 @@ function updates(arr) {
     console.log(' ');
     hook.send('Now watching Nike Snkrs!');
     cycle++;
+    //if any subsequent cycle, run functions to check for new items and restocks
   } else {
     newStock = arr;
-    //create a shallow clone of currentStock with just IDs for easier sorting of newStock using the .sort method
+
+    //create a shallow clone of currentStock with just ids for findNewItems() and findRestocks()
     currentShallow = [];
     for (i in currentStock) {
       currentShallow.push(currentStock[i].id);
     };
-    //ALL OF THIS IS UNNECESSARY NOW GAWD DELET IT PLS
-    //sort newStock so that the indices of its IDs match those of currentStock
-    //ALL OF THIS IS UNNECESSARY NOW GAWD DELET IT PLS
-    newStock = newStock.sort(function(a,b){
-      return currentShallow.indexOf(a.id) - currentShallow.indexOf(b.id);
-    });
-    //by default items not in currentStock are placed first in newStock with the above method
-    //this method places them last
-    for (i in newStock) {
-      if (!currentShallow.includes(newStock[i].id)) {
-        newStock.push(newStock.shift());
-      }
-    };
-    //all this is done so that the indices of all items in both currentStock AND newStock match up,
-    //which is the basis for how findRestocks() works without using a milliion nested for loops.
-    //it still uses a lot of nested for loops though lol
 
     //find all the new items from this scan and post them
-    var newDrops = findNewDrops(newStock, currentShallow);
-    for (i in newDrops) {
+    var newItems = findNewItems(newStock, currentShallow);
+    for (i in newItems) {
+      console.log('NEW ITEM: ' + newItems[i].link);
       hook.send({
         embeds: [{
           color: 3447003,
           thumbnail: {
-            'url': newDrops[i].thumbnail
+            'url': newItems[i].thumbnail
           },
-          title: 'NIKE SNKRS DROP',
+          title: 'NIKE SNKRS NEW ITEM',
           fields: [
             {
               name: 'Item:',
-              value: newDrops[i].name
+              value: newItems[i].name
             },
             {
               name: 'Color:',
-              value: newDrops[i].color
+              value: newItems[i].color
             },
             {
               name: 'Price:',
-              value: newDrops[i].price
+              value: newItems[i].price
             },
             {
               name: 'Link:',
-              value: newDrops[i].link
+              value: newItems[i].link
             }
           ]
         }]
@@ -130,6 +125,7 @@ function updates(arr) {
     //find all restocks by size from this scan and post them
     var restockedItems = findRestocks(currentStock, newStock, currentShallow);
     for (i in restockedItems) {
+      console.log('RESTOCK: ' + restockedItems[i].link);
       hook.send({
         embeds: [{
           color: 3447003,
@@ -177,69 +173,47 @@ function monitor() {
 
   var completeArr = [];
 
-  rp.get(nikeURLs[0])
+  //long chain of promises to make sure the 4 api calls happen asynchronously
+  rp.get(nikeURLs.urls[0])
   .then((body) => {
     let json = JSON.parse(body);
-    try {
-      for (x in json.objects) {
-        if(!json.objects[x].publishedContent.properties.custom.restricted) {
-          completeArr.push(json.objects[x]);
-        }
+    for (x in json.objects) {
+      if(!json.objects[x].publishedContent.properties.custom.restricted) {
+        completeArr.push(json.objects[x]);
       }
-    } catch(ex) {
-      console.log(ex);
-      console.log('this shouldn\'t be an issue, moving on...');
-      //sometimes while I was building this it would attempt to scan an object that wasn't there, which
-      //would throw an error and crash the whole thing. However the program can still go on despite this with
-      //no issue, which is why this catch is here. It hasn't happened since production though.
     }
   })
   .then(() => {
-    return rp.get(nikeURLs[1]);
+    return rp.get(nikeURLs.urls[1]);
   })
   .then((body) => {
     let json = JSON.parse(body);
-    try {
-      for (x in json.objects) {
-        if(!json.objects[x].publishedContent.properties.custom.restricted) {
-          completeArr.push(json.objects[x]);
-        }
+    for (x in json.objects) {
+      if(!json.objects[x].publishedContent.properties.custom.restricted) {
+        completeArr.push(json.objects[x]);
       }
-    } catch(ex) {
-      console.log(ex);
-      console.log('this shouldn\'t be an issue, moving on...');
     }
   })
   .then(() => {
-    return rp.get(nikeURLs[2]);
+    return rp.get(nikeURLs.urls[2]);
   })
   .then((body) => {
     let json = JSON.parse(body);
-    try {
-      for (x in json.objects) {
-        if(!json.objects[x].publishedContent.properties.custom.restricted) {
-          completeArr.push(json.objects[x]);
-        }
+    for (x in json.objects) {
+      if(!json.objects[x].publishedContent.properties.custom.restricted) {
+        completeArr.push(json.objects[x]);
       }
-    } catch(ex) {
-      console.log(ex);
-      console.log('this shouldn\'t be an issue, moving on...');
     }
   })
   .then(() => {
-    return rp.get(nikeURLs[3]);
+    return rp.get(nikeURLs.urls[3]);
   })
   .then((body) => {
     let json = JSON.parse(body);
-    try {
-      for (x in json.objects) {
-        if(!json.objects[x].publishedContent.properties.custom.restricted) {
-          completeArr.push(json.objects[x]);
-        }
+    for (x in json.objects) {
+      if(!json.objects[x].publishedContent.properties.custom.restricted) {
+        completeArr.push(json.objects[x]);
       }
-    } catch(ex) {
-      console.log(ex);
-      console.log('this shouldn\'t be an issue, moving on...');
     }
     return completeArr;
   })
