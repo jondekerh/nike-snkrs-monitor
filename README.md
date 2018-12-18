@@ -14,9 +14,15 @@ After installing dependencies you'll need to rename the `RENAME-discord-info.jso
 
 Running:
 ```
-node monitor.js
+$ node monitor.js
 ```
 That's all you need to type. By default it will scan for changes every 5 minutes. This can be changed by editing the value of refreshDelay, found on line 12 of monitor.js. I recommend using [Linux Screen](https://www.rackaid.com/blog/linux-screen-tutorial-and-how-to/) to run it in the background.
+
+Testing:
+```
+$ npm test
+```
+Running the tests will also start the script after they are complete.
 
 # To Do
 - [x] Add proper tests.

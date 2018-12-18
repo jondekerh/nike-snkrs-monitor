@@ -4,7 +4,7 @@
   "description": "a discord monitor for nike snkrs",
   "main": "monitor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/jondekerh/nike-snkrs-monitor#readme",
   "dependencies": {
+    "chai": "^4.2.0",
     "discord.js": "^11.4.2",
+    "mocha": "^5.2.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   }
