@@ -229,3 +229,7 @@ function monitor() {
 };
 
 monitor();
+
+//testing exports
+module.exports.findRestocks = findRestocks;
+module.exports.findNewItems = findNewItems;
