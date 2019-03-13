@@ -1,7 +1,7 @@
 # nike snkrs monitor
 This is a lightweight and easy to use script that monitors [nike snkrs](https://www.nike.com/launch/?s=in-stock) for new items and restocks by sizes and posts them to Discord.
 
-**WARNING:** I've noticed that this script has gotten a few stars and forks recently. Just to clarify, when I last worked on this script I was having issues with duplicate posts or missing products that never got solved. This script pulls data directly from the nike snkrs API and not the site itself, so it's not always a reliable reflection of which products are listed on the site. Basically what I'm saying is there are still some known issues that I just don't have the time to research and fix right now and I cannot guarintee the script in its current version will give you the most accurate information.
+**WARNING:** I've noticed that this script has gotten a few stars and forks recently. Just to clarify, when I last worked on this script I was having issues with duplicate posts and missing products that never got solved. This script pulls data directly from the nike snkrs API and not the site itself, so it's not always a reliable reflection of which products are listed on the site. Basically what I'm saying is there are still some known issues that I just don't have the time to research and fix right now and I cannot guarintee the script in its current version will give you the most accurate information.
 
 # Installation
 To use this script you must have [node.js](https://nodejs.org/en/).
