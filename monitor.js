@@ -38,7 +38,8 @@ function findRestocks(arr1, arr2, shallowArr1) {
                 "color": arr2[i].productInfo[j].productContent.colorDescription,
                 "size": arr2[i].productInfo[j].skus[k].nikeSize,
                 "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
-                "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
+                "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug,
+                "launchId": arr2[i].productInfo[j].launchView.id,
               });
             }
           }
@@ -63,7 +64,8 @@ function findNewItems(arr2, shallowArr1) {
         "name": arr2[i].productInfo[0].productContent.title,
         "color": arr2[i].productInfo[0].productContent.colorDescription,
         "price": '$' + arr2[i].productInfo[0].merchPrice.currentPrice,
-        "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug
+        "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug,
+        "launchId": arr2[i].productInfo[0].launchView.id,
       });
     }
   };
@@ -116,7 +118,11 @@ function updates(arr) {
             {
               name: 'Link:',
               value: newItems[i].link
-            }
+            },
+            {
+              name: 'Launch ID',
+              value: restockedItems[i].launchId
+            },
           ]
         }]
       })
@@ -153,7 +159,11 @@ function updates(arr) {
             {
               name: 'Link:',
               value: restockedItems[i].link
-            }
+            },
+            {
+              name:'Launch ID',
+              value: restockedItems[i].launchId
+            },
           ]
         }]
       })
