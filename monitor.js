@@ -32,14 +32,22 @@ function findRestocks(arr1, arr2, shallowArr1) {
         } else {
           for (k in arr2[i].productInfo[j].availableSkus) {
             if (arr1[n].productInfo[j].availableSkus[k].available === false && arr2[i].productInfo[j].availableSkus[k].available === true) {
+              var launchid = "";
+              if (arr2[i].productInfo[j].hasOwnProperty('launchView')) {
+                launchid = arr2[i].productInfo[j].launchView.id;
+              }
+              var sizeVaraint = arr2[i].productInfo[j].skus[k].id;
+              var link = 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug;
               restocks.push({
                 "thumbnail": arr2[i].productInfo[j].imageUrls.productImageUrl,
                 "name": arr2[i].productInfo[j].productContent.title,
                 "color": arr2[i].productInfo[j].productContent.colorDescription,
                 "size": arr2[i].productInfo[j].skus[k].nikeSize,
                 "price": '$' + arr2[i].productInfo[j].merchPrice.currentPrice,
-                "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug,
-                "launchId": arr2[i].productInfo[j].launchView.id,
+                "link": link,
+                "launchId": launchid,
+                "sizeVaraint": sizeVaraint,
+                "checkout": 'https://gs.nike.com/?checkoutId=467b1823-b354-4039-a3da-ad641289576b&launchId=' + launchid + '&skuId=' + sizeVaraint + '&country=TH&locale=th&appId=com.nike.commerce.snkrs.web&returnUrl=https://www.nike.com/launch/t/'+link,
               });
             }
           }
@@ -59,13 +67,29 @@ function findNewItems(arr2, shallowArr1) {
     //if our new items were not previously in currentStock, push an object with that items info
     //to our differences array
     if (!shallowArr1.includes(arr2[i].id)) {
+      var sizeArr = [];
+      var launchid = "";
+      var link = arr2[i].publishedContent.properties.seo.slug
+      if (arr2[i].productInfo[0].hasOwnProperty('launchView')) {
+
+        launchid = arr2[i].productInfo[0].launchView.id;
+      }
+      for (j in arr2[i].productInfo[0].availableSkus){
+        var sizeVaraint = arr2[i].productInfo[0].availableSkus[j].id
+        sizeArr.push({
+          "sizeId": sizeVaraint,
+          "checkoutLink": 'https://gs.nike.com/?checkoutId=467b1823-b354-4039-a3da-ad641289576b&launchId=' + launchid + '&skuId=' + sizeVaraint + '&country=TH&locale=th&appId=com.nike.commerce.snkrs.web&returnUrl=https://www.nike.com/launch/t/' + link,
+        });
+      }
+      
       differences.push({
         "thumbnail": arr2[i].productInfo[0].imageUrls.productImageUrl,
         "name": arr2[i].productInfo[0].productContent.title,
         "color": arr2[i].productInfo[0].productContent.colorDescription,
         "price": '$' + arr2[i].productInfo[0].merchPrice.currentPrice,
-        "link": 'https://www.nike.com/launch/t/' + arr2[i].publishedContent.properties.seo.slug,
-        "launchId": arr2[i].productInfo[0].launchView.id,
+        "link": 'https://www.nike.com/launch/t/' + link,
+        "launchId": launchid,
+        "sizeIds": sizeArr
       });
     }
   };
